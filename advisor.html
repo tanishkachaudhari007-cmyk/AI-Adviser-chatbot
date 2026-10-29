@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}AI Financial Advisor - Personal Finance Advisor{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <div class="section-eyebrow">
+            AI FINANCIAL ASSISTANT
+        </div>
+
+        <h1>
+            Financial Advisor
+        </h1>
+
+        <p>
+            Get personalized insights based on your income,
+            spending, budgets, and saving goals.
+        </p>
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FINANCIAL SNAPSHOT
+========================= -->
+
+<div class="kpi-grid advisor-summary">
+
+    <div class="kpi-card income-card">
+
+        <div class="kpi-label">
+            TOTAL INCOME
+        </div>
+
+        <div class="kpi-value">
+            ₹{{ "{:,.2f}".format(total_income) }}
+        </div>
+
+        <div class="kpi-description">
+            Recorded income
+        </div>
+
+    </div>
+
+
+    <div class="kpi-card expense-card">
+
+        <div class="kpi-label">
+            TOTAL EXPENSES
+        </div>
+
+        <div class="kpi-value">
+            ₹{{ "{:,.2f}".format(total_expenses) }}
+        </div>
+
+        <div class="kpi-description">
+            Recorded spending
+        </div>
+
+    </div>
+
+
+    <div class="kpi-card savings-card">
+
+        <div class="kpi-label">
+            CURRENT SAVINGS
+        </div>
+
+        <div class="kpi-value">
+            ₹{{ "{:,.2f}".format(savings) }}
+        </div>
+
+        <div class="kpi-description">
+            Income minus expenses
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     AI ANALYSIS
+========================= -->
+
+<div class="ai-advisor-layout">
+
+
+    <!-- LEFT: ANALYSIS PANEL -->
+
+    <div class="professional-card ai-control-card">
+
+        <div class="ai-brand">
+
+            <div class="ai-brand-icon">
+                AI
+            </div>
+
+            <div>
+
+                <div class="card-eyebrow">
+                    PERSONALIZED ANALYSIS
+                </div>
+
+                <h2>
+                    Analyze My Finances
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <p class="ai-description">
+
+            The AI advisor reviews your recorded income,
+            expenses, budgets, and saving goals to identify
+            spending patterns and provide practical suggestions.
+
+        </p>
+
+
+        <div class="ai-features">
+
+            <div class="ai-feature">
+                <span class="feature-check">✓</span>
+                Spending analysis
+            </div>
+
+            <div class="ai-feature">
+                <span class="feature-check">✓</span>
+                Saving suggestions
+            </div>
+
+            <div class="ai-feature">
+                <span class="feature-check">✓</span>
+                Budget observations
+            </div>
+
+            <div class="ai-feature">
+                <span class="feature-check">✓</span>
+                Personalized financial tips
+            </div>
+
+        </div>
+
+
+        <form
+            method="POST"
+            class="ai-form"
+            onsubmit="showAIStatus()"
+        >
+
+            <button
+                type="submit"
+                class="ai-analyze-button"
+                id="analyzeButton"
+            >
+
+                <span id="buttonText">
+                    Analyze My Finances
+                </span>
+
+                <span
+                    id="buttonLoader"
+                    class="button-loader"
+                >
+                    Analyzing...
+                </span>
+
+            </button>
+
+        </form>
+
+
+        <div class="ai-disclaimer">
+
+            <strong>
+                Important:
+            </strong>
+
+            AI-generated insights are for educational
+            and informational purposes only. They are not
+            professional financial advice.
+
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT: AI RESULT -->
+
+    <div class="professional-card ai-result-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <span class="card-eyebrow">
+                    AI INSIGHTS
+                </span>
+
+                <h2>
+                    Your Financial Analysis
+                </h2>
+
+            </div>
+
+            <span class="ai-status">
+                AI
+            </span>
+
+        </div>
+
+
+        {% if advice %}
+
+            {% if advice.success %}
+
+                <div class="ai-response">
+
+                    <div class="ai-response-header">
+
+                        <div class="ai-response-icon">
+                            AI
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Personalized Financial Insights
+                            </strong>
+
+                            <span>
+                                Generated from your financial data
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-message">
+
+                        {{ advice.message }}
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="ai-error">
+
+                    <div class="ai-error-title">
+                        Analysis temporarily unavailable
+                    </div>
+
+                    <p>
+                        {{ advice.message }}
+                    </p>
+
+                    <p class="ai-error-help">
+                        Please wait a little and try again.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        {% else %}
+
+            <div class="ai-empty">
+
+                <div class="ai-empty-icon">
+                    AI
+                </div>
+
+                <h3>
+                    Ready to analyze your finances
+                </h3>
+
+                <p>
+                    Click the button to generate personalized
+                    financial insights using your current data.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+function showAIStatus() {
+
+    const button = document.getElementById("analyzeButton");
+
+    const buttonText = document.getElementById("buttonText");
+
+    const buttonLoader = document.getElementById("buttonLoader");
+
+    if (!button) {
+        return;
+    }
+
+    button.disabled = true;
+
+    buttonText.style.display = "none";
+
+    buttonLoader.style.display = "inline";
+
+}
+
+</script>
+
+{% endblock %}

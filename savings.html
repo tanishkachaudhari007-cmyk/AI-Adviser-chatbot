@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}Saving Goals - Personal Finance Advisor{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="section-eyebrow">FINANCIAL PLANNING</div>
+        <h1>Saving Goals</h1>
+        <p>Set financial targets and track your progress over time.</p>
+    </div>
+</div>
+
+
+<!-- SUMMARY CARDS -->
+<div class="kpi-grid savings-summary">
+
+    <div class="kpi-card savings-card">
+        <div class="kpi-label">TOTAL SAVED</div>
+
+        <div class="kpi-value">
+            ₹{{ "{:,.2f}".format(goal_data | sum(attribute="saved")) }}
+        </div>
+
+        <div class="kpi-description">
+            Amount saved across all goals
+        </div>
+    </div>
+
+
+    <div class="kpi-card">
+        <div class="kpi-label">TOTAL TARGET</div>
+
+        <div class="kpi-value">
+            ₹{{ "{:,.2f}".format(goal_data | sum(attribute="target")) }}
+        </div>
+
+        <div class="kpi-description">
+            Combined target amount
+        </div>
+    </div>
+
+
+    <div class="kpi-card">
+        <div class="kpi-label">ACTIVE GOALS</div>
+
+        <div class="kpi-value">
+            {{ goal_data|length }}
+        </div>
+
+        <div class="kpi-description">
+            Goals currently being tracked
+        </div>
+    </div>
+
+</div>
+
+
+<!-- CREATE GOAL -->
+<div class="professional-card">
+
+    <div class="card-header">
+
+        <div>
+            <span class="card-eyebrow">GOAL SETUP</span>
+            <h2>Create a Saving Goal</h2>
+        </div>
+
+    </div>
+
+
+    <form method="POST" class="professional-form">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label for="name">Goal Name</label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. New Laptop"
+                    required
+                >
+
+                <small>
+                    Give your goal a meaningful name.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="target">Target Amount</label>
+
+                <div class="currency-input">
+
+                    <span>₹</span>
+
+                    <input
+                        type="number"
+                        id="target"
+                        name="target"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+                <small>
+                    Enter the total amount required for your goal.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="saved">Amount Already Saved</label>
+
+                <div class="currency-input">
+
+                    <span>₹</span>
+
+                    <input
+                        type="number"
+                        id="saved"
+                        name="saved"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                        required
+                    >
+
+                </div>
+
+                <small>
+                    Enter the amount you have already saved.
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button type="submit" class="primary-button">
+                Create Saving Goal
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- GOALS -->
+<div class="professional-card">
+
+    <div class="card-header">
+
+        <div>
+            <span class="card-eyebrow">GOAL PROGRESS</span>
+            <h2>Your Saving Goals</h2>
+        </div>
+
+        <span class="record-count">
+            {{ goal_data|length }} goals
+        </span>
+
+    </div>
+
+
+    {% if goal_data %}
+
+    <div class="saving-goals-list">
+
+        {% for goal in goal_data %}
+
+        <div class="saving-goal-item">
+
+            <!-- TOP -->
+            <div class="saving-goal-header">
+
+                <div class="saving-goal-title">
+
+                    <div class="saving-goal-icon">
+                        ₹
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            {{ goal.name }}
+                        </h3>
+
+                        <p>
+                            Target:
+                            ₹{{ "{:,.2f}".format(goal.target) }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% if goal.progress >= 100 %}
+
+                    <span class="goal-status goal-status-complete">
+                        Completed
+                    </span>
+
+                {% elif goal.progress >= 75 %}
+
+                    <span class="goal-status goal-status-near">
+                        Almost there
+                    </span>
+
+                {% else %}
+
+                    <span class="goal-status goal-status-active">
+                        In progress
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PROGRESS -->
+            <div class="saving-progress-section">
+
+                <div class="saving-progress-label">
+
+                    <span>Progress</span>
+
+                    <strong>
+                        {{ "%.1f"|format(goal.progress) }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="saving-progress-track">
+
+                    <div
+                        class="saving-progress-fill
+                        {% if goal.progress >= 100 %}
+                            saving-progress-complete
+                        {% elif goal.progress >= 75 %}
+                            saving-progress-near
+                        {% endif %}"
+                        style="width: {{ [goal.progress, 100]|min }}%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DETAILS -->
+            <div class="saving-goal-details">
+
+                <div class="saving-detail">
+
+                    <span>Saved</span>
+
+                    <strong>
+                        ₹{{ "{:,.2f}".format(goal.saved) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="saving-detail">
+
+                    <span>Target</span>
+
+                    <strong>
+                        ₹{{ "{:,.2f}".format(goal.target) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="saving-detail">
+
+                    <span>Remaining</span>
+
+                    {% if goal.remaining > 0 %}
+
+                    <strong>
+                        ₹{{ "{:,.2f}".format(goal.remaining) }}
+                    </strong>
+
+                    {% else %}
+
+                    <strong class="goal-complete-text">
+                        Goal reached
+                    </strong>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <div class="saving-empty-state">
+
+        <div class="saving-empty-icon">
+            ₹
+        </div>
+
+        <h3>No saving goals yet</h3>
+
+        <p>
+            Create your first financial goal above
+            and start tracking your savings progress.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

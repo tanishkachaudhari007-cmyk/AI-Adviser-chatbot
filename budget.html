@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}Budget Planner - Personal Finance Advisor{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <div class="section-eyebrow">
+            FINANCIAL PLANNING
+        </div>
+
+        <h1>
+            Budget Planner
+        </h1>
+
+        <p>
+            Set spending limits and monitor your actual expenses.
+        </p>
+    </div>
+
+</div>
+
+
+<!-- =========================
+     BUDGET SUMMARY
+========================= -->
+
+<div class="kpi-grid income-summary">
+
+    <div class="kpi-card">
+
+        <div class="kpi-label">
+            TOTAL BUDGET
+        </div>
+
+        <div class="kpi-value">
+            ₹{{ "{:,.2f}".format(
+                budget_data | sum(attribute="budget")
+            ) }}
+        </div>
+
+        <div class="kpi-description">
+            Planned spending limit
+        </div>
+
+    </div>
+
+
+    <div class="kpi-card expense-card">
+
+        <div class="kpi-label">
+            TOTAL SPENT
+        </div>
+
+        <div class="kpi-value">
+            ₹{{ "{:,.2f}".format(
+                budget_data | sum(attribute="spent")
+            ) }}
+        </div>
+
+        <div class="kpi-description">
+            Actual recorded spending
+        </div>
+
+    </div>
+
+
+    <div class="kpi-card savings-card">
+
+        <div class="kpi-label">
+            REMAINING
+        </div>
+
+        <div class="kpi-value">
+            ₹{{ "{:,.2f}".format(
+                budget_data | sum(attribute="remaining")
+            ) }}
+        </div>
+
+        <div class="kpi-description">
+            Available budget balance
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CREATE / UPDATE BUDGET
+========================= -->
+
+<div class="professional-card">
+
+    <div class="card-header">
+
+        <div>
+
+            <span class="card-eyebrow">
+                BUDGET SETTINGS
+            </span>
+
+            <h2>
+                Set Category Budget
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <form method="POST" class="professional-form">
+
+        <div class="form-grid">
+
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                    required
+                >
+
+                    <option value="">
+                        Select a category
+                    </option>
+
+                    <option value="Food">
+                        Food
+                    </option>
+
+                    <option value="Rent">
+                        Rent
+                    </option>
+
+                    <option value="Transport">
+                        Transport
+                    </option>
+
+                    <option value="Education">
+                        Education
+                    </option>
+
+                    <option value="Healthcare">
+                        Healthcare
+                    </option>
+
+                    <option value="Entertainment">
+                        Entertainment
+                    </option>
+
+                    <option value="Shopping">
+                        Shopping
+                    </option>
+
+                    <option value="Bills">
+                        Bills
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+                <small>
+                    Select the spending category.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="amount">
+                    Budget Limit
+                </label>
+
+                <div class="currency-input">
+
+                    <span>₹</span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+                <small>
+                    Maximum amount you plan to spend.
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Save Budget
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- =========================
+     BUDGET OVERVIEW
+========================= -->
+
+<div class="professional-card">
+
+    <div class="card-header">
+
+        <div>
+
+            <span class="card-eyebrow">
+                BUDGET PERFORMANCE
+            </span>
+
+            <h2>
+                Budget vs Actual
+            </h2>
+
+        </div>
+
+        <span class="record-count">
+            {{ budget_data|length }} categories
+        </span>
+
+    </div>
+
+
+    {% if budget_data %}
+
+        <div class="budget-list">
+
+            {% for item in budget_data %}
+
+                {% if item.budget > 0 %}
+
+                    {% set percentage =
+                        (item.spent / item.budget) * 100
+                    %}
+
+                {% else %}
+
+                    {% set percentage = 0 %}
+
+                {% endif %}
+
+
+                {% if percentage > 100 %}
+
+                    {% set display_percentage = 100 %}
+
+                {% else %}
+
+                    {% set display_percentage = percentage %}
+
+                {% endif %}
+
+
+                <div class="budget-item">
+
+
+                    <!-- Header -->
+
+                    <div class="budget-item-header">
+
+                        <div>
+
+                            <div class="transaction-name">
+                                {{ item.category }}
+                            </div>
+
+                            <div class="transaction-type">
+                                ₹{{ "{:,.2f}".format(item.spent) }}
+                                spent of
+                                ₹{{ "{:,.2f}".format(item.budget) }}
+                            </div>
+
+                        </div>
+
+
+                        {% if percentage > 100 %}
+
+                            <span class="budget-status status-danger">
+                                Over budget
+                            </span>
+
+                        {% elif percentage >= 80 %}
+
+                            <span class="budget-status status-warning">
+                                Near limit
+                            </span>
+
+                        {% else %}
+
+                            <span class="budget-status status-success">
+                                On track
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Progress -->
+
+                    <div class="budget-progress">
+
+                        <div
+                            class="budget-progress-bar
+                            {% if percentage > 100 %}
+                                progress-danger
+                            {% elif percentage >= 80 %}
+                                progress-warning
+                            {% endif %}"
+                            style="width: {{ display_percentage }}%;"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- Footer -->
+
+                    <div class="budget-item-footer">
+
+                        <span>
+                            {{ "%.0f"|format(percentage) }}% used
+                        </span>
+
+                        {% if item.remaining >= 0 %}
+
+                            <span>
+                                ₹{{ "{:,.2f}".format(
+                                    item.remaining
+                                ) }}
+                                remaining
+                            </span>
+
+                        {% else %}
+
+                            <span class="danger-text">
+                                ₹{{ "{:,.2f}".format(
+                                    item.remaining|abs
+                                ) }}
+                                over limit
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                +
+            </div>
+
+            <h3>
+                No budgets created
+            </h3>
+
+            <p>
+                Set your first category budget above to
+                start monitoring your spending.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
